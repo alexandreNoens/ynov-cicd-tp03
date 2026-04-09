@@ -13,18 +13,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Set up uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          cache-dependency-glob: requirements/requirements.in
-
-      - name: Install dependencies
-        run: make install
+      - name: Set up Python environment
+        uses: ./.github/actions/setup-python-env
 
       - name: Run lint
         run: make lint
@@ -40,18 +30,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Set up uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          cache-dependency-glob: requirements/requirements.in
-
-      - name: Install dependencies
-        run: make install
+      - name: Set up Python environment
+        uses: ./.github/actions/setup-python-env
 
       - name: Run unit tests
         run: make check-unit
@@ -84,18 +64,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Set up uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          cache-dependency-glob: requirements/requirements.in
-
-      - name: Install dependencies
-        run: make install
+      - name: Set up Python environment
+        uses: ./.github/actions/setup-python-env
 
       - name: Run integration tests
         run: make check-integration
