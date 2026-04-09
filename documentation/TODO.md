@@ -8,3 +8,5 @@
 - [ ] Ajouter un badge pipeline dans le README
 - [ ] Ajouter un badge ou une section couverture dans le README
 - [ ] Lier le README vers le rapport ou l'artefact de coverage
+
+- [ ] Faire verifier le lint par la pipeline CI
