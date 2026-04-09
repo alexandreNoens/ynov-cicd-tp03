@@ -20,6 +20,8 @@ jobs:
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v5
+        with:
+          cache-dependency-glob: requirements/requirements.in
 
       - name: Install dependencies
         run: make install
@@ -45,6 +47,8 @@ jobs:
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v5
+        with:
+          cache-dependency-glob: requirements/requirements.in
 
       - name: Install dependencies
         run: make install
@@ -87,6 +91,8 @@ jobs:
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v5
+        with:
+          cache-dependency-glob: requirements/requirements.in
 
       - name: Install dependencies
         run: make install
