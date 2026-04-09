@@ -11,3 +11,5 @@
 - [ ] Faire verifier le lint par la pipeline CI
 - [ ] Rendre la CI verte obligatoire avant merge (branch protection)
 - [ ] Atteindre un minimum de 5 PR mergees
+
+- [ ] Trivy Scan de vulnerabilites à integrer à la pipeline CI
