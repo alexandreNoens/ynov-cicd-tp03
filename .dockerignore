@@ -1,5 +1,6 @@
 .git
 .github
+.gitignore
 .venv
 .pytest_cache
 .ruff_cache
