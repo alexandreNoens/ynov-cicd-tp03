@@ -51,7 +51,7 @@ pre-commit:
 	@git diff --quiet || (echo "Formatting changed files. Stage changes and commit again." && exit 1)
 
 docker-run:
-	docker compose up -d db
+	docker compose up -d
 
 docker-stop:
 	docker compose down

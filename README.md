@@ -40,6 +40,26 @@ make serve
 make check
 ```
 
+## Lancement avec Docker
+
+1. Copier les variables d'environnement:
+
+```bash
+cp .env.example .env
+```
+
+2. Construire et lancer API + PostgreSQL:
+
+```bash
+docker compose up --build
+```
+
+3. Tester l'API:
+
+```bash
+curl http://localhost:8000/health
+```
+
 ## Rendu / Documentation
 
 La documentation du projet est centralisee dans le dossier [documentation](documentation).
