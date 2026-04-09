@@ -48,7 +48,8 @@ format:
 pre-commit:
 	$(MAKE) format
 	$(MAKE) lint
-	@git diff --quiet || (echo "Formatting changed files. Stage changes and commit again." && exit 1)
+	@staged_files="$$(git diff --cached --name-only --diff-filter=ACMR)"; \
+	[ -z "$$staged_files" ] || git diff --quiet -- $$staged_files || (echo "Formatting changed staged files. Stage changes and commit again." && exit 1)
 
 docker-run:
 	docker compose up -d
