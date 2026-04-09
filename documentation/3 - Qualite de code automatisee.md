@@ -17,7 +17,7 @@ Elements en place:
 
 - regles Ruff personnalisees: `E`, `F`, `I`
 - longueur de ligne fixee a `80`
-- cible Python `py311`
+- cible Python `py312`
 - formatage automatique via Ruff formatter
 
 Preuves:

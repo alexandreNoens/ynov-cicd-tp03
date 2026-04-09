@@ -4,7 +4,7 @@ pythonpath = ["."]
 
 [tool.ruff]
 line-length = 80
-target-version = "py311"
+target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
