@@ -6,6 +6,8 @@ UVICORN ?= $(PYTHON) -m uvicorn
 PYTEST ?= $(PYTHON) -m pytest
 PYTEST_ARGS ?= -vv -ra --cov=app --cov-report=term-missing --cov-fail-under=90
 UNIT_TEST_PATHS ?= tests/models
+UNIT_COVERAGE_TARGET ?= app.models
+UNIT_PYTEST_ARGS ?= -vv -ra --cov=$(UNIT_COVERAGE_TARGET) --cov-report=term-missing --cov-report=xml --cov-fail-under=70
 INTEGRATION_TEST_PATHS ?= tests/repositories tests/routes tests/test_health.py tests/test_lifespan.py
 RUFF ?= $(PYTHON) -m ruff
 APP ?= app.main:app
@@ -36,7 +38,7 @@ check:
 	$(PYTEST) $(PYTEST_ARGS)
 
 check-unit:
-	$(PYTEST) -vv -ra $(UNIT_TEST_PATHS)
+	$(PYTEST) $(UNIT_PYTEST_ARGS) $(UNIT_TEST_PATHS)
 
 check-integration:
 	$(PYTEST) -vv -ra $(INTEGRATION_TEST_PATHS)
@@ -48,7 +50,7 @@ fix:
 	$(RUFF) check . --fix
 
 clean:
-	rm -rf $(VENV) .pytest_cache .ruff_cache $(REQ_LOCK)
+	rm -rf $(VENV) .pytest_cache .ruff_cache $(REQ_LOCK) coverage.xml
 
 format:
 	$(RUFF) format .
