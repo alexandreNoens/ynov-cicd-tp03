@@ -5,11 +5,17 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+RUN groupadd --system app && useradd --system --gid app --create-home app
+
 COPY requirements/requirements.lock /tmp/requirements.lock
 RUN pip install --no-cache-dir -r /tmp/requirements.lock
 
 COPY app ./app
 COPY sql ./sql
+
+RUN chown -R app:app /app
+
+USER app
 
 EXPOSE 8000
 
