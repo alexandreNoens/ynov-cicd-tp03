@@ -1,19 +1,33 @@
-FROM python:3.12-slim
+FROM python:3.12-slim AS build
 
 WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV VIRTUAL_ENV=/opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
-RUN groupadd --system app && useradd --system --gid app --create-home app
+RUN python -m venv "$VIRTUAL_ENV"
 
 COPY requirements/requirements.lock /tmp/requirements.lock
 RUN pip install --no-cache-dir -r /tmp/requirements.lock
 
+FROM python:3.12-slim AS production
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV VIRTUAL_ENV=/opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+RUN groupadd --system app && useradd --system --gid app --create-home app
+
+COPY --from=build /opt/venv /opt/venv
 COPY app ./app
 COPY sql ./sql
 
-RUN chown -R app:app /app
+RUN chown -R app:app /app /opt/venv
 
 USER app
 
