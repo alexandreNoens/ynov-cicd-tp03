@@ -10,3 +10,5 @@
 - [ ] Lier le README vers le rapport ou l'artefact de coverage
 
 - [ ] Faire verifier le lint par la pipeline CI
+- [ ] Rendre la CI verte obligatoire avant merge (branch protection)
+- [ ] Atteindre un minimum de 5 PR mergees
