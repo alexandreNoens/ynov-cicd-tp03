@@ -26,11 +26,9 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 RUN groupadd --system app && useradd --system --gid app --create-home app
 
-COPY --from=build /opt/venv /opt/venv
-COPY app ./app
-COPY sql ./sql
-
-RUN chown -R app:app /app /opt/venv
+COPY --from=build --chown=app:app /opt/venv /opt/venv
+COPY --chown=app:app app ./app
+COPY --chown=app:app sql ./sql
 
 USER app
 
