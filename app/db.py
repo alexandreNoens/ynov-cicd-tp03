@@ -16,25 +16,17 @@ def get_connection() -> PgConnection:
     return psycopg2.connect(DATABASE_URL)
 
 
-def _execute_sql_script(connection: PgConnection, script: str) -> None:
-    with connection.cursor() as cursor:
-        cursor.execute(script)
-
-
 def init_db() -> None:
     with get_connection() as connection:
-        schema = SCHEMA_PATH.read_text(encoding="utf-8")
-        _execute_sql_script(connection, schema)
+        with connection.cursor() as cursor:
+            cursor.execute(SCHEMA_PATH.read_text(encoding="utf-8"))
         connection.commit()
 
 
 def reset_db() -> None:
     with get_connection() as connection:
-        _execute_sql_script(
-            connection, "DROP TABLE IF EXISTS students CASCADE;"
-        )
-        schema = SCHEMA_PATH.read_text(encoding="utf-8")
-        _execute_sql_script(connection, schema)
-        dev_data = DEV_DATA_PATH.read_text(encoding="utf-8")
-        _execute_sql_script(connection, dev_data)
+        with connection.cursor() as cursor:
+            cursor.execute("DROP TABLE IF EXISTS students CASCADE;")
+            cursor.execute(SCHEMA_PATH.read_text(encoding="utf-8"))
+            cursor.execute(DEV_DATA_PATH.read_text(encoding="utf-8"))
         connection.commit()
