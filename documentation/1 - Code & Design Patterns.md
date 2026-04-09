@@ -21,23 +21,25 @@ Exemple :
 ```python
 def create_student(student: StudentCreate) -> Student:
 	query = """
-	INSERT INTO students (firstName, lastName, email, grade, field)
-	VALUES (?, ?, ?, ?, ?)
+	INSERT INTO students (first_name, last_name, email, grade, field)
+	VALUES (%s, %s, %s, %s, %s)
+	RETURNING id
 	"""
 	try:
 		with get_connection() as connection:
-			cursor = connection.execute(
-				query,
-				(
-					student.firstName,
-					student.lastName,
-					student.email,
-					student.grade,
-					student.field,
-				),
-			)
-			created_student_id = cursor.lastrowid
-	except sqlite3.IntegrityError as exc:
+			with connection.cursor() as cursor:
+				cursor.execute(
+					query,
+					(
+						student.first_name,
+						student.last_name,
+						student.email,
+						student.grade,
+						student.field,
+					),
+				)
+				created_student_id = cursor.fetchone()[0]
+	except psycopg2.IntegrityError as exc:
 		if "students.email" in str(exc):
 			raise StudentEmailAlreadyExistsError() from exc
 
@@ -67,8 +69,8 @@ Exemple :
 
 ```python
 class StudentCreate(BaseModel):
-	firstName: str = Field(min_length=2)
-	lastName: str = Field(min_length=2)
+	first_name: str = Field(min_length=2)
+	last_name: str = Field(min_length=2)
 	email: str
 	grade: float = Field(ge=0, le=20)
 	field: Literal["informatique", "mathématiques", "physique", "chimie"]

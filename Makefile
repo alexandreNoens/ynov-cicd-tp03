@@ -1,11 +1,11 @@
-.PHONY: install install-db serve check lint format format-check pre-commit install-hooks clean
+.PHONY: install install-db serve check lint fix format format-check pre-commit install-hooks compose-up compose-down clean
 
 VENV ?= .venv
 PYTHON ?= $(VENV)/bin/python
-UVICORN ?= $(VENV)/bin/uvicorn
-PYTEST ?= $(VENV)/bin/pytest
+UVICORN ?= $(PYTHON) -m uvicorn
+PYTEST ?= $(PYTHON) -m pytest
 PYTEST_ARGS ?= -vv -ra --cov=app --cov-report=term-missing --cov-fail-under=90
-RUFF ?= $(VENV)/bin/ruff
+RUFF ?= $(PYTHON) -m ruff
 APP ?= app.main:app
 HOST ?= 0.0.0.0
 PORT ?= 8000
@@ -36,6 +36,9 @@ check:
 lint:
 	$(RUFF) check .
 
+fix:
+	$(RUFF) check . --fix
+
 clean:
 	rm -rf $(VENV) .pytest_cache .ruff_cache $(REQ_LOCK)
 
@@ -46,3 +49,9 @@ pre-commit:
 	$(MAKE) format
 	$(MAKE) lint
 	@git diff --quiet || (echo "Formatting changed files. Stage changes and commit again." && exit 1)
+
+docker-run:
+	docker compose up -d db
+
+docker-stop:
+	docker compose down

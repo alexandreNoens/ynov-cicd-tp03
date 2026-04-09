@@ -1,4 +1,6 @@
-import sqlite3
+import psycopg2
+from psycopg2 import errorcodes
+from psycopg2.extras import RealDictCursor
 
 from app.db import get_connection
 from app.exceptions.student import (
@@ -9,8 +11,8 @@ from app.models.student import Student, StudentCreate
 
 SORT_COLUMNS = {
     "id": "id",
-    "firstName": "firstName",
-    "lastName": "lastName",
+    "first_name": "first_name",
+    "last_name": "last_name",
     "email": "email",
     "grade": "grade",
     "field": "field",
@@ -29,27 +31,35 @@ def list_students(
     sort_column = SORT_COLUMNS[sort]
     sort_order = SORT_ORDERS[order]
     query = """
-    SELECT id, firstName, lastName, email, grade, field
+    SELECT id,
+           first_name,
+           last_name,
+           email, grade, field
     FROM students
     ORDER BY {sort_column} {sort_order}, id ASC
-    LIMIT ? OFFSET ?
+    LIMIT %s OFFSET %s
     """.format(sort_column=sort_column, sort_order=sort_order)
     with get_connection() as connection:
-        connection.row_factory = sqlite3.Row
-        rows = connection.execute(query, (limit, offset)).fetchall()
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query, (limit, offset))
+            rows = cursor.fetchall()
 
     return [Student(**dict(row)) for row in rows]
 
 
 def get_student_by_id(student_id: int) -> Student | None:
     query = """
-    SELECT id, firstName, lastName, email, grade, field
+    SELECT id,
+           first_name,
+           last_name,
+           email, grade, field
     FROM students
-    WHERE id = ?
+    WHERE id = %s
     """
     with get_connection() as connection:
-        connection.row_factory = sqlite3.Row
-        row = connection.execute(query, (student_id,)).fetchone()
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query, (student_id,))
+            row = cursor.fetchone()
 
     if row is None:
         return None
@@ -59,24 +69,26 @@ def get_student_by_id(student_id: int) -> Student | None:
 
 def create_student(student: StudentCreate) -> Student:
     query = """
-    INSERT INTO students (firstName, lastName, email, grade, field)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO students (first_name, last_name, email, grade, field)
+    VALUES (%s, %s, %s, %s, %s)
+    RETURNING id
     """
     try:
         with get_connection() as connection:
-            cursor = connection.execute(
-                query,
-                (
-                    student.firstName,
-                    student.lastName,
-                    student.email,
-                    student.grade,
-                    student.field,
-                ),
-            )
-            created_student_id = cursor.lastrowid
-    except sqlite3.IntegrityError as exc:
-        if "students.email" in str(exc):
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    query,
+                    (
+                        student.first_name,
+                        student.last_name,
+                        student.email,
+                        student.grade,
+                        student.field,
+                    ),
+                )
+                created_student_id = cursor.fetchone()[0]
+    except psycopg2.IntegrityError as exc:
+        if exc.pgcode == errorcodes.UNIQUE_VIOLATION:
             raise StudentEmailAlreadyExistsError() from exc
         raise  # pragma: no cover
 
@@ -90,26 +102,27 @@ def create_student(student: StudentCreate) -> Student:
 def update_student(student_id: int, student: StudentCreate) -> Student:
     query = """
     UPDATE students
-    SET firstName = ?, lastName = ?, email = ?, grade = ?, field = ?
-    WHERE id = ?
+    SET first_name = %s, last_name = %s, email = %s, grade = %s, field = %s
+    WHERE id = %s
     """
     try:
         with get_connection() as connection:
-            cursor = connection.execute(
-                query,
-                (
-                    student.firstName,
-                    student.lastName,
-                    student.email,
-                    student.grade,
-                    student.field,
-                    student_id,
-                ),
-            )
-            if cursor.rowcount == 0:
-                raise StudentNotFoundError()
-    except sqlite3.IntegrityError as exc:
-        if "students.email" in str(exc):
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    query,
+                    (
+                        student.first_name,
+                        student.last_name,
+                        student.email,
+                        student.grade,
+                        student.field,
+                        student_id,
+                    ),
+                )
+                if cursor.rowcount == 0:
+                    raise StudentNotFoundError()
+    except psycopg2.IntegrityError as exc:
+        if exc.pgcode == errorcodes.UNIQUE_VIOLATION:
             raise StudentEmailAlreadyExistsError() from exc
         raise  # pragma: no cover
 
@@ -123,34 +136,40 @@ def update_student(student_id: int, student: StudentCreate) -> Student:
 def delete_student(student_id: int) -> None:
     query = """
     DELETE FROM students
-    WHERE id = ?
+    WHERE id = %s
     """
     with get_connection() as connection:
-        cursor = connection.execute(query, (student_id,))
-        if cursor.rowcount == 0:
-            raise StudentNotFoundError()
+        with connection.cursor() as cursor:
+            cursor.execute(query, (student_id,))
+            if cursor.rowcount == 0:
+                raise StudentNotFoundError()
 
 
 def get_students_stats() -> dict[str, object]:
     with get_connection() as connection:
-        connection.row_factory = sqlite3.Row
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                "SELECT COUNT(*) AS total, AVG(grade) AS average FROM students"
+            )
+            total_and_average_row = cursor.fetchone()
 
-        total_and_average_row = connection.execute(
-            "SELECT COUNT(*) AS total, AVG(grade) AS average FROM students"
-        ).fetchone()
+            cursor.execute(
+                "SELECT field, COUNT(*) AS total FROM students GROUP BY field"
+            )
+            fields_rows = cursor.fetchall()
 
-        fields_rows = connection.execute(
-            "SELECT field, COUNT(*) AS total FROM students GROUP BY field"
-        ).fetchall()
-
-        best_student_row = connection.execute(
-            """
-            SELECT id, firstName, lastName, email, grade, field
-            FROM students
-            ORDER BY grade DESC, id ASC
-            LIMIT 1
-            """
-        ).fetchone()
+            cursor.execute(
+                """
+                SELECT id,
+                       first_name,
+                       last_name,
+                       email, grade, field
+                FROM students
+                ORDER BY grade DESC, id ASC
+                LIMIT 1
+                """
+            )
+            best_student_row = cursor.fetchone()
 
     total_students = int(total_and_average_row["total"])
     average_grade_value = total_and_average_row["average"]
@@ -187,16 +206,18 @@ def search_students(query: str) -> list[Student]:
     normalized_query = query.strip().lower()
     like_term = f"%{normalized_query}%"
     search_query = """
-    SELECT id, firstName, lastName, email, grade, field
+    SELECT id,
+           first_name,
+           last_name,
+           email, grade, field
     FROM students
-    WHERE LOWER(firstName) LIKE ? OR LOWER(lastName) LIKE ?
+    WHERE LOWER(first_name) LIKE %s OR LOWER(last_name) LIKE %s
     ORDER BY id ASC
     """
 
     with get_connection() as connection:
-        connection.row_factory = sqlite3.Row
-        rows = connection.execute(
-            search_query, (like_term, like_term)
-        ).fetchall()
+        with connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(search_query, (like_term, like_term))
+            rows = cursor.fetchall()
 
     return [Student(**dict(row)) for row in rows]

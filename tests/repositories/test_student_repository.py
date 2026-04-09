@@ -26,8 +26,8 @@ def test_list_students_returns_students_ordered_by_id() -> None:
     assert len(students) == 5
     assert all(isinstance(student, Student) for student in students)
     assert [student.id for student in students] == [1, 2, 3, 4, 5]
-    assert students[0].firstName == "Harry"
-    assert students[1].firstName == "Hermione"
+    assert students[0].first_name == "harry"
+    assert students[1].first_name == "hermione"
 
 
 def test_get_student_by_id_returns_student_when_found() -> None:
@@ -35,7 +35,7 @@ def test_get_student_by_id_returns_student_when_found() -> None:
 
     assert isinstance(student, Student)
     assert student.id == 1
-    assert student.firstName == "Harry"
+    assert student.first_name == "harry"
 
 
 def test_get_student_by_id_returns_none_when_missing() -> None:
@@ -51,7 +51,7 @@ def test_create_student_returns_created_student_with_generated_id(
 
     assert isinstance(created_student, Student)
     assert created_student.id == 6
-    assert created_student.firstName == "Neville"
+    assert created_student.first_name == "neville"
     assert created_student.email == "neville.longbottom@hogwarts.edu"
 
 
@@ -61,8 +61,8 @@ def test_create_student_raises_error_when_email_already_exists(
     with pytest.raises(StudentEmailAlreadyExistsError):
         create_student(
             student_create_factory(
-                firstName="Harry",
-                lastName="Potter",
+                first_name="harry",
+                last_name="potter",
                 email="harry.potter@hogwarts.edu",
                 grade=18,
                 field="informatique",
@@ -76,8 +76,8 @@ def test_update_student_returns_updated_student_when_found(
     updated_student = update_student(
         1,
         student_create_factory(
-            firstName="Harry",
-            lastName="Potter",
+            first_name="harry",
+            last_name="potter",
             email="harry.j.potter@hogwarts.edu",
             grade=18.5,
             field="physique",
@@ -134,7 +134,7 @@ def test_get_students_stats_returns_expected_aggregates() -> None:
     }
     best_student = stats["bestStudent"]
     assert isinstance(best_student, Student)
-    assert best_student.firstName == "Hermione"
+    assert best_student.first_name == "hermione"
     assert best_student.grade == 19.8
 
 
@@ -142,7 +142,7 @@ def test_search_students_returns_case_insensitive_matches() -> None:
     students = search_students("grAn")
 
     assert len(students) == 1
-    assert students[0].firstName == "Hermione"
+    assert students[0].first_name == "hermione"
 
 
 def test_search_students_returns_empty_list_when_no_match() -> None:
@@ -153,7 +153,8 @@ def test_search_students_returns_empty_list_when_no_match() -> None:
 
 def test_get_students_stats_returns_empty_values_when_no_student() -> None:
     with get_connection() as connection:
-        connection.execute("DELETE FROM students")
+        with connection.cursor() as cursor:
+            cursor.execute("DELETE FROM students")
 
     stats = get_students_stats()
 

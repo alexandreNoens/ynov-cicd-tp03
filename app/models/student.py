@@ -5,8 +5,8 @@ from pydantic import BaseModel, Field, field_validator
 
 
 class StudentCreate(BaseModel):
-    firstName: str = Field(min_length=2)
-    lastName: str = Field(min_length=2)
+    first_name: str = Field(min_length=2)
+    last_name: str = Field(min_length=2)
     email: str
     grade: float = Field(ge=0, le=20)
     field: Literal["informatique", "mathématiques", "physique", "chimie"]

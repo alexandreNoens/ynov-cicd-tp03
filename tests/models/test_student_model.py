@@ -6,8 +6,8 @@ from app.models.student import Student
 
 def student_payload(**overrides: object) -> dict[str, object]:
     payload: dict[str, object] = {
-        "firstName": "Harry",
-        "lastName": "Potter",
+        "first_name": "harry",
+        "last_name": "potter",
         "email": "harry.potter@hogwarts.edu",
         "grade": 17.5,
         "field": "informatique",
@@ -27,23 +27,23 @@ def test_id_accepts_integer() -> None:
 
 
 def test_first_name_valid() -> None:
-    student = Student(**student_payload(firstName="Albus"))
-    assert student.firstName == "Albus"
+    student = Student(**student_payload(first_name="albus"))
+    assert student.first_name == "albus"
 
 
 def test_first_name_too_short_raises_error() -> None:
     with pytest.raises(ValidationError):
-        Student(**student_payload(firstName="A"))
+        Student(**student_payload(first_name="a"))
 
 
 def test_last_name_valid() -> None:
-    student = Student(**student_payload(lastName="Granger"))
-    assert student.lastName == "Granger"
+    student = Student(**student_payload(last_name="granger"))
+    assert student.last_name == "granger"
 
 
 def test_last_name_too_short_raises_error() -> None:
     with pytest.raises(ValidationError):
-        Student(**student_payload(lastName="G"))
+        Student(**student_payload(last_name="g"))
 
 
 def test_email_valid() -> None:

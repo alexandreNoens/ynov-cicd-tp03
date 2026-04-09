@@ -1,7 +1,6 @@
 # todo
 
-- [ ] Separer base de test et base de production
-- [ ] Etudier un passage a PostgreSQL
+- [ ] Separer explicitement la base de test et la base de production
 
 - [ ] Publier le rapport de couverture comme artefact du pipeline
 - [ ] Verifier que le seuil de couverture casse bien la CI

@@ -28,8 +28,8 @@ def get_students(
     limit: int = Query(default=10, ge=1),
     sort: Literal[
         "id",
-        "firstName",
-        "lastName",
+        "first_name",
+        "last_name",
         "email",
         "grade",
         "field",

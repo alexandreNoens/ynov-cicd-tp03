@@ -14,40 +14,40 @@ def test_get_students_returns_json_array_with_status_200(
     assert payload == [
         {
             "id": 1,
-            "firstName": "Harry",
-            "lastName": "Potter",
+            "first_name": "harry",
+            "last_name": "potter",
             "email": "harry.potter@hogwarts.edu",
             "grade": 17.5,
             "field": "informatique",
         },
         {
             "id": 2,
-            "firstName": "Hermione",
-            "lastName": "Granger",
+            "first_name": "hermione",
+            "last_name": "granger",
             "email": "hermione.granger@hogwarts.edu",
             "grade": 19.8,
             "field": "mathématiques",
         },
         {
             "id": 3,
-            "firstName": "Ron",
-            "lastName": "Weasley",
+            "first_name": "ron",
+            "last_name": "weasley",
             "email": "ron.weasley@hogwarts.edu",
             "grade": 14.2,
             "field": "chimie",
         },
         {
             "id": 4,
-            "firstName": "Luna",
-            "lastName": "Lovegood",
+            "first_name": "luna",
+            "last_name": "lovegood",
             "email": "luna.lovegood@hogwarts.edu",
             "grade": 16.1,
             "field": "physique",
         },
         {
             "id": 5,
-            "firstName": "Draco",
-            "lastName": "Malfoy",
+            "first_name": "draco",
+            "last_name": "malfoy",
             "email": "draco.malfoy@hogwarts.edu",
             "grade": 13.7,
             "field": "informatique",
@@ -86,12 +86,12 @@ def test_get_students_sort_by_grade_desc_returns_expected_order(
 
     assert response.status_code == 200
     payload = response.json()
-    assert [student["firstName"] for student in payload] == [
-        "Hermione",
-        "Harry",
-        "Luna",
-        "Ron",
-        "Draco",
+    assert [student["first_name"] for student in payload] == [
+        "hermione",
+        "harry",
+        "luna",
+        "ron",
+        "draco",
     ]
 
 
@@ -104,7 +104,7 @@ def test_get_students_search_returns_200_with_case_insensitive_matches(
     payload = response.json()
     assert isinstance(payload, list)
     assert len(payload) == 1
-    assert payload[0]["firstName"] == "Hermione"
+    assert payload[0]["first_name"] == "hermione"
 
 
 def test_get_students_search_returns_400_when_q_is_missing(
@@ -140,7 +140,7 @@ def test_get_students_stats_returns_200_and_expected_stats(
         "physique": 1,
         "chimie": 1,
     }
-    assert payload["bestStudent"]["firstName"] == "Hermione"
+    assert payload["bestStudent"]["first_name"] == "hermione"
     assert payload["bestStudent"]["grade"] == 19.8
 
 
@@ -152,7 +152,7 @@ def test_get_student_returns_json_object_with_status_200_when_found(
     assert response.status_code == 200
     payload = response.json()
     assert payload["id"] == 1
-    assert payload["firstName"] == "Harry"
+    assert payload["first_name"] == "harry"
 
 
 def test_get_student_returns_404_when_id_does_not_exist(
@@ -182,7 +182,7 @@ def test_post_student_returns_201_and_created_student(
     assert response.status_code == 201
     payload = response.json()
     assert payload["id"] == 6
-    assert payload["firstName"] == "Neville"
+    assert payload["first_name"] == "neville"
     assert payload["email"] == "neville.longbottom@hogwarts.edu"
 
 
@@ -202,7 +202,7 @@ def test_post_student_returns_400_when_first_name_is_too_short(
     student_payload_factory: Callable[..., dict[str, object]],
 ) -> None:
     response = client.post(
-        "/students", json=student_payload_factory(firstName="N")
+        "/students", json=student_payload_factory(first_name="n")
     )
 
     assert response.status_code == 400
@@ -213,7 +213,7 @@ def test_post_student_returns_400_when_last_name_is_too_short(
     student_payload_factory: Callable[..., dict[str, object]],
 ) -> None:
     response = client.post(
-        "/students", json=student_payload_factory(lastName="L")
+        "/students", json=student_payload_factory(last_name="l")
     )
 
     assert response.status_code == 400
@@ -281,8 +281,8 @@ def test_put_student_returns_200_and_updated_student_when_successful(
     response = client.put(
         "/students/1",
         json=student_payload_factory(
-            firstName="Harry",
-            lastName="Potter",
+            first_name="harry",
+            last_name="potter",
             email="harry.j.potter@hogwarts.edu",
             grade=18.5,
             field="physique",
@@ -325,7 +325,7 @@ def test_put_student_returns_400_when_payload_is_invalid(
 ) -> None:
     response = client.put(
         "/students/1",
-        json=student_payload_factory(firstName="N"),
+        json=student_payload_factory(first_name="n"),
     )
 
     assert response.status_code == 400

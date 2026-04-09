@@ -10,8 +10,8 @@ from app.models.student import StudentCreate
 
 def _default_student_payload() -> dict[str, object]:
     return {
-        "firstName": "Neville",
-        "lastName": "Longbottom",
+        "first_name": "neville",
+        "last_name": "longbottom",
         "email": "neville.longbottom@hogwarts.edu",
         "grade": 15.4,
         "field": "physique",

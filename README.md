@@ -2,6 +2,44 @@
 
 Concevez, developpez et deployez une application complete avec un pipeline CI/CD professionnel, une architecture de code solide, et une infrastructure reproductible. Votre code, votre pipeline, vos choix, vos justifications.
 
+## Lancement rapide
+
+1. Copier les variables d'environnement:
+
+```bash
+cp .env.example .env
+```
+
+2. Installer les dependances Python:
+
+```bash
+make install
+```
+
+3. Lancer PostgreSQL en local:
+
+```bash
+make compose-up
+```
+
+4. Initialiser schema + donnees:
+
+```bash
+make install-db
+```
+
+5. Lancer l'API:
+
+```bash
+make serve
+```
+
+6. Executer la suite de tests:
+
+```bash
+make check
+```
+
 ## Rendu / Documentation
 
 La documentation du projet est centralisee dans le dossier [documentation](documentation).

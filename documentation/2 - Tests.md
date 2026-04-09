@@ -5,7 +5,7 @@
 Le projet contient principalement des tests unitaires et des tests d'integration.
 
 - tests unitaires: validation du modele `Student`
-- tests d'integration: repository + SQLite
+- tests d'integration: repository + PostgreSQL
 - tests d'integration: routes FastAPI + validation + base de donnees
 - tests techniques complementaires: healthcheck et cycle de vie de l'application
 
@@ -18,8 +18,8 @@ Les tests unitaires couvrent la logique de validation du modele Pydantic.
 Exemples verifies:
 
 - valeur par defaut de `id`
-- validation de `firstName`
-- validation de `lastName`
+- validation de `first_name`
+- validation de `last_name`
 - validation de l'email
 - bornes de `grade`
 - enum `field`
@@ -53,7 +53,7 @@ Deux niveaux d'integration sont presents.
 
 ### Integration repository + base de donnees
 
-Les tests repository verifient l'interaction entre la couche d'acces aux donnees et SQLite.
+Les tests repository verifient l'interaction entre la couche d'acces aux donnees et PostgreSQL.
 
 Cas verifies:
 
@@ -133,10 +133,10 @@ Analyse:
 
 Point important:
 
-- la base de test n'est pas une SQLite en memoire;
-- elle est cependant reinitialisee automatiquement et se comporte comme une base dediee a la suite de tests.
+- la base de test n'est pas une base in-memory;
+- elle est reinitialisee automatiquement par `reset_db()` avant chaque test.
 
-Pour aller encore plus loin, une amelioration possible serait d'utiliser une base SQLite strictement in-memory ou une base de test distincte du fichier local courant.
+Pour aller encore plus loin, une amelioration possible serait de separer explicitement les environnements `dev` et `test` avec une base PostgreSQL de test dediee.
 
 ## Mocking
 
