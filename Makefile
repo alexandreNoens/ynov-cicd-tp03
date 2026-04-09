@@ -1,4 +1,4 @@
-.PHONY: install install-db serve check lint format clean
+.PHONY: install install-db serve check lint format format-check pre-commit install-hooks clean
 
 VENV ?= .venv
 PYTHON ?= $(VENV)/bin/python
@@ -13,10 +13,15 @@ REQ_DIR ?= requirements
 REQ_IN ?= $(REQ_DIR)/requirements.in
 REQ_LOCK ?= $(REQ_DIR)/requirements.lock
 
-install:
+install: install-hooks
 	@if [ ! -d $(VENV) ]; then uv venv $(VENV); fi
 	uv pip compile $(REQ_IN) --generate-hashes -o $(REQ_LOCK)
 	uv pip install --python $(PYTHON) -r $(REQ_LOCK)
+
+install-hooks:
+	@git config core.hooksPath .githooks
+	@chmod +x .githooks/pre-commit
+	@echo "Git hooks installed. pre-commit will run make pre-commit"
 
 install-db:
 	@if [ ! -d $(VENV) ]; then uv venv $(VENV); fi
@@ -36,3 +41,8 @@ clean:
 
 format:
 	$(RUFF) format .
+
+pre-commit:
+	$(MAKE) format
+	$(MAKE) lint
+	@git diff --quiet || (echo "Formatting changed files. Stage changes and commit again." && exit 1)
