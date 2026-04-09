@@ -10,11 +10,13 @@ Document a consulter:
 
 - [1 - Code & Design Patterns.md](documentation/1%20-%20Code%20&%20Design%20Patterns.md)
 - [2 - Tests.md](documentation/2%20-%20Tests.md)
+- [TODO.md](documentation/TODO.md)
 
 Arborescence :
 
 ```text
 documentation/
 ├── 1 - Code & Design Patterns.md
-└── 2 - Tests.md
+├── 2 - Tests.md
+└── TODO.md
 ```
