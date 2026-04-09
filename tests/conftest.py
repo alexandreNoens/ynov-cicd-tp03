@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -18,8 +19,22 @@ def _default_student_payload() -> dict[str, object]:
     }
 
 
+def _requires_database(request: pytest.FixtureRequest) -> bool:
+    test_path = Path(str(request.node.fspath))
+    return test_path.parent.name in {
+        "repositories",
+        "routes",
+    } or test_path.name in {
+        "test_health.py",
+        "test_lifespan.py",
+    }
+
+
 @pytest.fixture(autouse=True)
-def reset_database() -> None:
+def reset_database(request: pytest.FixtureRequest) -> None:
+    if not _requires_database(request):
+        return
+
     reset_db()
 
 

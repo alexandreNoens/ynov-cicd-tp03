@@ -1,10 +1,12 @@
-.PHONY: install install-db serve check lint fix format format-check pre-commit install-hooks compose-up compose-down clean
+.PHONY: install install-db serve check check-unit check-integration lint fix format format-check pre-commit install-hooks compose-up compose-down clean
 
 VENV ?= .venv
 PYTHON ?= $(VENV)/bin/python
 UVICORN ?= $(PYTHON) -m uvicorn
 PYTEST ?= $(PYTHON) -m pytest
 PYTEST_ARGS ?= -vv -ra --cov=app --cov-report=term-missing --cov-fail-under=90
+UNIT_TEST_PATHS ?= tests/models
+INTEGRATION_TEST_PATHS ?= tests/repositories tests/routes tests/test_health.py tests/test_lifespan.py
 RUFF ?= $(PYTHON) -m ruff
 APP ?= app.main:app
 HOST ?= 0.0.0.0
@@ -33,6 +35,12 @@ serve:
 check:
 	$(PYTEST) $(PYTEST_ARGS)
 
+check-unit:
+	$(PYTEST) -vv -ra $(UNIT_TEST_PATHS)
+
+check-integration:
+	$(PYTEST) -vv -ra $(INTEGRATION_TEST_PATHS)
+
 lint:
 	$(RUFF) check .
 
@@ -44,6 +52,9 @@ clean:
 
 format:
 	$(RUFF) format .
+
+format-check:
+	$(RUFF) format --check .
 
 pre-commit:
 	$(MAKE) format
