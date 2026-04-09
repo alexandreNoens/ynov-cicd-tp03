@@ -14,6 +14,9 @@ RUN pip install --no-cache-dir -r /tmp/requirements.lock
 
 FROM python:3.12-slim AS production
 
+LABEL maintainer="alexandre"
+LABEL version="1.0.0"
+
 WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1
