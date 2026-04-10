@@ -6,6 +6,10 @@ on:
       - master
   pull_request:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   lint-and-format:
     name: Lint and format check
@@ -115,10 +119,20 @@ jobs:
     name: Build image Docker
     runs-on: ubuntu-latest
     needs: [lint-and-format, unit-tests, integration-tests]
+    env:
+      IMAGE: ghcr.io/${{ github.repository }}:${{ github.sha }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build -t tp03-app:${{ github.sha }} .
+        run: docker build -t $IMAGE .
+
+      - name: Log in to GHCR
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Push Docker image
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
+        run: docker push $IMAGE
