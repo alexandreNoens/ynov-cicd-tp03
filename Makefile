@@ -1,22 +1,14 @@
-.PHONY: install install-db serve check check-unit check-integration lint fix format format-check pre-commit install-hooks compose-up compose-down clean upgrade audit
+.PHONY: install install-hooks install-db upgrade check check-unit check-integration format format-check lint fix pre-commit audit serve docker-run docker-stop clean
 
+# --- Tooling and runtime ---
 VENV ?= .venv
 PYTHON ?= $(VENV)/bin/python
+UV ?= uv
 UVICORN ?= $(PYTHON) -m uvicorn
 PYTEST ?= $(PYTHON) -m pytest
-PYTEST_COMMON_ARGS ?= -vv -ra
-PYTEST_COVERAGE_REPORT_ARGS ?= --cov-report=term-missing
-PYTEST_COV_FAIL_UNDER ?= 90
-PYTEST_COV_FAIL_UNDER_ARG ?= --cov-fail-under=$(PYTEST_COV_FAIL_UNDER)
-PYTEST_ARGS ?= $(PYTEST_COMMON_ARGS) --cov=app $(PYTEST_COVERAGE_REPORT_ARGS) $(PYTEST_COV_FAIL_UNDER_ARG)
-UNIT_TEST_PATHS ?= tests/models
-UNIT_COVERAGE_TARGET ?= app.models
-UNIT_PYTEST_ARGS ?= $(PYTEST_COMMON_ARGS) --cov=$(UNIT_COVERAGE_TARGET) $(PYTEST_COVERAGE_REPORT_ARGS) $(PYTEST_COV_FAIL_UNDER_ARG)
-INTEGRATION_TEST_PATHS ?= tests/repositories tests/routes tests/test_health.py tests/test_lifespan.py
-INTEGRATION_COVERAGE_TARGET ?= app
-INTEGRATION_PYTEST_ARGS ?= $(PYTEST_COMMON_ARGS) --cov=$(INTEGRATION_COVERAGE_TARGET) $(PYTEST_COVERAGE_REPORT_ARGS) $(PYTEST_COV_FAIL_UNDER_ARG)
 RUFF ?= $(PYTHON) -m ruff
-UV ?= uv
+
+# --- Project settings ---
 APP ?= app.main:app
 HOST ?= 0.0.0.0
 PORT ?= 8000
@@ -24,6 +16,21 @@ REQ_DIR ?= requirements
 REQ_IN ?= $(REQ_DIR)/requirements.in
 REQ_LOCK ?= $(REQ_DIR)/requirements.lock
 
+# --- Test settings ---
+PYTEST_COMMON_ARGS ?= -vv -ra
+PYTEST_COVERAGE_REPORT_ARGS ?= --cov-report=term-missing
+PYTEST_COV_FAIL_UNDER ?= 90
+PYTEST_COV_FAIL_UNDER_ARG ?= --cov-fail-under=$(PYTEST_COV_FAIL_UNDER)
+
+PYTEST_ARGS ?= $(PYTEST_COMMON_ARGS) --cov=app $(PYTEST_COVERAGE_REPORT_ARGS) $(PYTEST_COV_FAIL_UNDER_ARG)
+UNIT_TEST_PATHS ?= tests/models
+UNIT_COVERAGE_TARGET ?= app.models
+UNIT_PYTEST_ARGS ?= $(PYTEST_COMMON_ARGS) --cov=$(UNIT_COVERAGE_TARGET) $(PYTEST_COVERAGE_REPORT_ARGS) $(PYTEST_COV_FAIL_UNDER_ARG)
+INTEGRATION_TEST_PATHS ?= tests/repositories tests/routes tests/test_health.py tests/test_lifespan.py
+INTEGRATION_COVERAGE_TARGET ?= app
+INTEGRATION_PYTEST_ARGS ?= $(PYTEST_COMMON_ARGS) --cov=$(INTEGRATION_COVERAGE_TARGET) $(PYTEST_COVERAGE_REPORT_ARGS) $(PYTEST_COV_FAIL_UNDER_ARG)
+
+# --- Environment setup ---
 install: install-hooks
 	@if [ ! -d $(VENV) ]; then uv venv $(VENV); fi
 	uv pip compile $(REQ_IN) --generate-hashes -o $(REQ_LOCK)
@@ -42,9 +49,7 @@ upgrade:
 	uv pip compile $(REQ_IN) --generate-hashes --upgrade -o $(REQ_LOCK)
 	uv pip install --python $(PYTHON) -r $(REQ_LOCK)
 
-serve:
-	$(UVICORN) $(APP) --reload --host $(HOST) --port $(PORT)
-
+# --- Test commands ---
 check:
 	$(PYTEST) $(PYTEST_ARGS)
 
@@ -54,20 +59,18 @@ check-unit:
 check-integration:
 	$(PYTEST) $(INTEGRATION_PYTEST_ARGS) $(INTEGRATION_TEST_PATHS)
 
-lint:
-	$(RUFF) check .
-
-fix:
-	$(RUFF) check . --fix
-
-clean:
-	rm -rf $(VENV) .pytest_cache .ruff_cache $(REQ_LOCK)
-
+# --- Code quality ---
 format:
 	$(RUFF) format .
 
 format-check:
 	$(RUFF) format --check .
+
+lint:
+	$(RUFF) check .
+
+fix:
+	$(RUFF) check . --fix
 
 pre-commit:
 	$(MAKE) format
@@ -78,8 +81,16 @@ pre-commit:
 audit:
 	$(UV) run pip-audit
 
+# --- App and containers ---
+serve:
+	$(UVICORN) $(APP) --reload --host $(HOST) --port $(PORT)
+
 docker-run:
 	docker compose up -d
 
 docker-stop:
 	docker compose down
+
+# --- Cleanup ---
+clean:
+	rm -rf $(VENV) .pytest_cache .ruff_cache $(REQ_LOCK)
