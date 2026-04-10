@@ -1,4 +1,4 @@
-.PHONY: install install-hooks install-db upgrade check check-unit check-integration format format-check lint fix pre-commit audit serve docker-run docker-stop clean
+.PHONY: help install install-hooks install-db upgrade check check-unit check-integration format format-check lint fix pre-commit audit serve docker-run docker-stop clean
 
 # --- Tooling and runtime ---
 VENV ?= .venv
@@ -31,6 +31,31 @@ INTEGRATION_COVERAGE_TARGET ?= app
 INTEGRATION_PYTEST_ARGS ?= $(PYTEST_COMMON_ARGS) --cov=$(INTEGRATION_COVERAGE_TARGET) $(PYTEST_COVERAGE_REPORT_ARGS) $(PYTEST_COV_FAIL_UNDER_ARG)
 
 # --- Environment setup ---
+help:
+	@printf "Available commands:\n\n"
+	@printf "Environment setup:\n"
+	@printf "  make install            Create the virtual environment and install locked dependencies\n"
+	@printf "  make install-hooks      Configure git hooks for the repository\n"
+	@printf "  make install-db         Reset and initialize the local database\n"
+	@printf "  make upgrade            Refresh the lockfile and upgrade dependencies\n\n"
+	@printf "Tests:\n"
+	@printf "  make check              Run the full test suite with coverage\n"
+	@printf "  make check-unit         Run unit tests with coverage\n"
+	@printf "  make check-integration  Run integration tests with coverage\n\n"
+	@printf "Code quality:\n"
+	@printf "  make format             Format the codebase with Ruff\n"
+	@printf "  make format-check       Verify formatting without changing files\n"
+	@printf "  make lint               Run static checks with Ruff\n"
+	@printf "  make fix                Apply automatic Ruff fixes\n"
+	@printf "  make pre-commit         Run formatting and lint checks used by the git hook\n"
+	@printf "  make audit              Scan Python dependencies for known vulnerabilities\n\n"
+	@printf "App and containers:\n"
+	@printf "  make serve              Start the API locally with auto-reload\n"
+	@printf "  make docker-run         Start services with docker compose\n"
+	@printf "  make docker-stop        Stop docker compose services\n\n"
+	@printf "Cleanup:\n"
+	@printf "  make clean              Remove caches, the virtual environment, and the lockfile\n"
+
 install: install-hooks
 	@if [ ! -d $(VENV) ]; then uv venv $(VENV); fi
 	uv pip compile $(REQ_IN) --generate-hashes -o $(REQ_LOCK)
