@@ -191,16 +191,18 @@ Attention toutefois:
 
 Etat actuel verifie:
 
-- la couverture est bien calculee localement par `pytest-cov`;
-- le seuil est bien bloquant;
-- le rapport affiche bien le detail par fichier dans la sortie console.
+- la couverture est calculee localement et en CI via `pytest-cov`;
+- le seuil est bloquant (`--cov-fail-under=90`);
+- les tests unitaires et d'integration executent chacun un coverage;
+- le detail par fichier est visible dans la sortie terminal.
 
-Point restant a industrialiser:
+Etat CI actuel:
 
-- le pipeline CI n'exporte pas encore officiellement un artefact de coverage;
-- la commande actuelle privilegie un rapport terminal, pas un export XML systematique.
+- les jobs `unit-tests` et `integration-tests` executent la couverture;
+- aucun artefact de coverage n'est publie pour le moment;
+- SonarCloud est execute dans un job dedie, mais la couverture y est exclue via la configuration courante.
 
-Si besoin pour la suite du projet, il faudra ajouter un rapport du type:
+Si besoin pour la suite du projet, il faudra ajouter un export XML puis publier l'artefact:
 
 ```bash
 pytest --cov=app --cov-report=term-missing --cov-report=xml:coverage.xml

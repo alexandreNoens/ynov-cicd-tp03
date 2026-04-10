@@ -4,10 +4,11 @@
 
 - linting et formatting: OK
 - pre-commit hook lint + format: OK
+- verification lint par pipeline CI (double filet): OK
+- sonarcloud + quality gate dans la CI: OK
+- cache des dependances Python dans la CI: OK
+- scan securite des dependances dans la CI: OK
 - dependabot: OK
-- sonarcloud / quality gate / commentaire PR: TODO
-- verification lint par pipeline CI (double filet): TODO
-- echec pipeline sur vulnerabilite critique: TODO
 
 ## Linting & Formatting
 
@@ -23,8 +24,8 @@ Elements en place:
 Preuves:
 
 - configuration Ruff: [pyproject.toml](../pyproject.toml)
-- commande lint: [Makefile](../Makefile#L36)
-- commande format: [Makefile](../Makefile#L41)
+- commande lint: [Makefile](../Makefile)
+- commande format: [Makefile](../Makefile)
 
 ## Pre-commit hook
 
@@ -38,43 +39,59 @@ Si le format modifie des fichiers, le commit est bloque pour obliger un restage 
 Preuves:
 
 - script hook: [.githooks/pre-commit](../.githooks/pre-commit)
-- installation des hooks: [Makefile](../Makefile#L18)
-- cible pre-commit: [Makefile](../Makefile#L44)
+- installation des hooks: [Makefile](../Makefile)
+- cible pre-commit: [Makefile](../Makefile)
 
 ## Double filet de securite (local + CI)
 
 Etat actuel:
 
 - filet local: OK (hook pre-commit)
-- filet CI: TODO
+- filet CI: OK (job dedie lint + format-check)
 
-Action restante:
+Preuves:
 
-- faire verifier le lint aussi dans la pipeline CI.
+- pipeline CI: [.github/workflows/ci.yml](../.github/workflows/ci.yml)
+- commandes qualite: [Makefile](../Makefile)
 
 ## Analyse statique et SonarCloud
 
-Etat actuel: TODO.
+Etat actuel: implemente dans la CI.
 
-Le plan d'implementation SonarCloud est decrit ici:
+Elements en place:
 
-- [TODO - SonarQube.md](TODO%20-%20SonarQube.md)
+- execution d'un scan SonarCloud dans un job dedie
+- attente explicite du resultat quality gate
+- timeout configure pour eviter un job bloque indefiniment
 
-Points cibles:
+Preuves:
 
-- scan Sonar dans la CI
-- quality gate: `0 bugs`, `0 vulnerabilities`, `duplication < 3%`, `coverage >= 70%`
-- commentaire automatique sur les PR
+- workflow CI: [.github/workflows/ci.yml](../.github/workflows/ci.yml)
 
 ## Securite des dependances
 
-Dependabot est configure.
+Dependabot est configure et complete par un scan en CI.
 
 Preuve:
 
 - config Dependabot: [.github/dependabot.yml](../.github/dependabot.yml)
+- job de scan securite: [.github/workflows/ci.yml](../.github/workflows/ci.yml)
+- commande de scan: [Makefile](../Makefile)
 
 Etat par exigence:
 
-- activation d'un outil de scan de dependances: OK (Dependabot)
-- echec pipeline en cas de vulnerabilite critique: TODO
+- activation d'un outil de scan de dependances: OK (Dependabot + pip-audit)
+- echec pipeline en cas de vulnerabilite detectee par le scan CI: OK
+
+## Performance CI: cache dependances Python
+
+L'action composite de setup Python active un cache pour reduire les temps d'installation.
+
+Elements caches:
+
+- cache pip (`~/.cache/pip`)
+- cache uv (`~/.cache/uv`)
+
+Preuve:
+
+- action composite: [.github/actions/setup-python-env/action.yml](../.github/actions/setup-python-env/action.yml)
