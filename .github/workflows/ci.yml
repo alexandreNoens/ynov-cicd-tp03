@@ -1,4 +1,4 @@
-name: CI
+name: CI - Lint, Tests, Sonar, Security
 
 on:
   push:
