@@ -4,11 +4,17 @@ VENV ?= .venv
 PYTHON ?= $(VENV)/bin/python
 UVICORN ?= $(PYTHON) -m uvicorn
 PYTEST ?= $(PYTHON) -m pytest
-PYTEST_ARGS ?= -vv -ra --cov=app --cov-report=term-missing --cov-fail-under=90
+PYTEST_COMMON_ARGS ?= -vv -ra
+PYTEST_COVERAGE_REPORT_ARGS ?= --cov-report=term-missing
+PYTEST_COV_FAIL_UNDER ?= 90
+PYTEST_COV_FAIL_UNDER_ARG ?= --cov-fail-under=$(PYTEST_COV_FAIL_UNDER)
+PYTEST_ARGS ?= $(PYTEST_COMMON_ARGS) --cov=app $(PYTEST_COVERAGE_REPORT_ARGS) $(PYTEST_COV_FAIL_UNDER_ARG)
 UNIT_TEST_PATHS ?= tests/models
 UNIT_COVERAGE_TARGET ?= app.models
-UNIT_PYTEST_ARGS ?= -vv -ra --cov=$(UNIT_COVERAGE_TARGET) --cov-report=term-missing --cov-report=xml --cov-fail-under=70
+UNIT_PYTEST_ARGS ?= $(PYTEST_COMMON_ARGS) --cov=$(UNIT_COVERAGE_TARGET) $(PYTEST_COVERAGE_REPORT_ARGS) $(PYTEST_COV_FAIL_UNDER_ARG)
 INTEGRATION_TEST_PATHS ?= tests/repositories tests/routes tests/test_health.py tests/test_lifespan.py
+INTEGRATION_COVERAGE_TARGET ?= app
+INTEGRATION_PYTEST_ARGS ?= $(PYTEST_COMMON_ARGS) --cov=$(INTEGRATION_COVERAGE_TARGET) $(PYTEST_COVERAGE_REPORT_ARGS) $(PYTEST_COV_FAIL_UNDER_ARG)
 RUFF ?= $(PYTHON) -m ruff
 UV ?= uv
 APP ?= app.main:app
@@ -42,14 +48,11 @@ serve:
 check:
 	$(PYTEST) $(PYTEST_ARGS)
 
-check-coverage:
-	$(PYTEST) -vv -ra --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=90
-
 check-unit:
 	$(PYTEST) $(UNIT_PYTEST_ARGS) $(UNIT_TEST_PATHS)
 
 check-integration:
-	$(PYTEST) -vv -ra $(INTEGRATION_TEST_PATHS)
+	$(PYTEST) $(INTEGRATION_PYTEST_ARGS) $(INTEGRATION_TEST_PATHS)
 
 lint:
 	$(RUFF) check .
@@ -58,7 +61,7 @@ fix:
 	$(RUFF) check . --fix
 
 clean:
-	rm -rf $(VENV) .pytest_cache .ruff_cache $(REQ_LOCK) coverage.xml
+	rm -rf $(VENV) .pytest_cache .ruff_cache $(REQ_LOCK)
 
 format:
 	$(RUFF) format .

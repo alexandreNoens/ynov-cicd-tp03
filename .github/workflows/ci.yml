@@ -38,13 +38,6 @@ jobs:
       - name: Run unit tests
         run: make check-unit
 
-      - name: Upload unit coverage report
-        uses: actions/upload-artifact@v4
-        with:
-          name: unit-test-coverage
-          path: coverage.xml
-          if-no-files-found: error
-
   integration-tests:
     name: Integration tests
     runs-on: ubuntu-latest

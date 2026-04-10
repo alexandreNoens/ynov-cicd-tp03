@@ -2,13 +2,6 @@
 testpaths = ["tests"]
 pythonpath = ["."]
 
-[tool.coverage.run]
-relative_files = true
-source = ["app"]
-
-[tool.coverage.xml]
-output = "coverage.xml"
-
 [tool.ruff]
 line-length = 80
 target-version = "py312"
