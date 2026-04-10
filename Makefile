@@ -1,4 +1,4 @@
-.PHONY: install install-db serve check check-unit check-integration lint fix format format-check pre-commit install-hooks compose-up compose-down clean
+.PHONY: install install-db serve check check-unit check-integration lint fix format format-check pre-commit install-hooks compose-up compose-down clean upgrade audit
 
 VENV ?= .venv
 PYTHON ?= $(VENV)/bin/python
@@ -31,6 +31,10 @@ install-hooks:
 install-db:
 	@if [ ! -d $(VENV) ]; then uv venv $(VENV); fi
 	$(PYTHON) -c "from app.db import reset_db; reset_db()"
+
+upgrade:
+	uv pip compile $(REQ_IN) --generate-hashes --upgrade -o $(REQ_LOCK)
+	uv pip install --python $(PYTHON) -r $(REQ_LOCK)
 
 serve:
 	$(UVICORN) $(APP) --reload --host $(HOST) --port $(PORT)
