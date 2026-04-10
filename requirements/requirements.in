@@ -1,5 +1,6 @@
 fastapi
 uvicorn
+pip-audit
 psycopg2-binary
 pytest
 pytest-cov

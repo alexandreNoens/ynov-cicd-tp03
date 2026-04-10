@@ -1,6 +1,7 @@
 # todo
 
 - [ ] Separer explicitement la base de test et la base de production
+- [ ] Separer les requirement dev / prod
 
 - [ ] Publier le rapport de couverture comme artefact du pipeline
 - [ ] Verifier que le seuil de couverture casse bien la CI

@@ -10,6 +10,7 @@ UNIT_COVERAGE_TARGET ?= app.models
 UNIT_PYTEST_ARGS ?= -vv -ra --cov=$(UNIT_COVERAGE_TARGET) --cov-report=term-missing --cov-report=xml --cov-fail-under=70
 INTEGRATION_TEST_PATHS ?= tests/repositories tests/routes tests/test_health.py tests/test_lifespan.py
 RUFF ?= $(PYTHON) -m ruff
+UV ?= uv
 APP ?= app.main:app
 HOST ?= 0.0.0.0
 PORT ?= 8000
@@ -66,6 +67,9 @@ pre-commit:
 	$(MAKE) lint
 	@staged_files="$$(git diff --cached --name-only --diff-filter=ACMR)"; \
 	[ -z "$$staged_files" ] || git diff --quiet -- $$staged_files || (echo "Formatting changed staged files. Stage changes and commit again." && exit 1)
+
+audit:
+	$(UV) run pip-audit
 
 docker-run:
 	docker compose up -d

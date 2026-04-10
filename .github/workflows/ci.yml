@@ -103,3 +103,17 @@ jobs:
             -Dsonar.coverage.exclusions=**
             -Dsonar.qualitygate.wait=true
             -Dsonar.qualitygate.timeout=300
+
+  security-scan:
+    name: Scan securite dependances
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python environment
+        uses: ./.github/actions/setup-python-env
+
+      - name: Scan for critical vulnerabilities
+        run: make audit
