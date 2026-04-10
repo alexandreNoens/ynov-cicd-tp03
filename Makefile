@@ -37,6 +37,9 @@ serve:
 check:
 	$(PYTEST) $(PYTEST_ARGS)
 
+check-coverage:
+	$(PYTEST) -vv -ra --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=90
+
 check-unit:
 	$(PYTEST) $(UNIT_PYTEST_ARGS) $(UNIT_TEST_PATHS)
 
