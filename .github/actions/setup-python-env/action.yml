@@ -19,6 +19,17 @@ runs:
       with:
         python-version: ${{ inputs.python-version }}
 
+    - name: Cache Python dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cache/pip
+          ~/.cache/uv
+        key: ${{ runner.os }}-python-${{ inputs.python-version }}-${{ hashFiles(inputs.cache-dependency-glob) }}
+        restore-keys: |
+          ${{ runner.os }}-python-${{ inputs.python-version }}-
+          ${{ runner.os }}-python-
+
     - name: Set up uv
       uses: astral-sh/setup-uv@v5
       with:
