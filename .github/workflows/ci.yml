@@ -110,3 +110,15 @@ jobs:
 
       - name: Scan for critical vulnerabilities
         run: make audit
+
+  docker-build:
+    name: Build image Docker
+    runs-on: ubuntu-latest
+    needs: [lint-and-format, unit-tests, integration-tests]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t tp03-app:${{ github.sha }} .
