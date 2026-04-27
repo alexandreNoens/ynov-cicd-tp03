@@ -1,4 +1,4 @@
-FROM python:3.12-slim AS build
+FROM python:3.12-alpine3.23 AS build
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ RUN python -m venv "$VIRTUAL_ENV"
 COPY requirements/requirements.lock /tmp/requirements.lock
 RUN pip install --no-cache-dir -r /tmp/requirements.lock
 
-FROM python:3.12-slim AS production
+FROM python:3.12-alpine3.23 AS production
 
 LABEL maintainer="alexandre"
 LABEL version="1.0.0"
@@ -24,7 +24,7 @@ ENV PYTHONUNBUFFERED=1
 ENV VIRTUAL_ENV=/opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-RUN groupadd --system app && useradd --system --gid app --create-home app
+RUN addgroup -S app && adduser -S -G app -h /home/app app
 
 COPY --from=build /opt/venv /opt/venv
 COPY app ./app
