@@ -22,7 +22,7 @@ from app.repositories.student import (
 router = APIRouter(tags=["students"])
 
 
-@router.get("/students", response_model=list[Student])
+@router.get("/students")
 def get_students(
     page: int = Query(default=1, ge=1),
     limit: int = Query(default=10, ge=1),
@@ -39,7 +39,7 @@ def get_students(
     return list_students(page=page, limit=limit, sort=sort, order=order)
 
 
-@router.get("/students/search", response_model=list[Student])
+@router.get("/students/search")
 def get_students_search(q: str | None = Query(default=None)) -> list[Student]:
     if q is None or not q.strip():
         raise HTTPException(
@@ -49,7 +49,7 @@ def get_students_search(q: str | None = Query(default=None)) -> list[Student]:
     return search_students(q)
 
 
-@router.post("/students", response_model=Student, status_code=201)
+@router.post("/students", status_code=201)
 def post_student(payload: dict[str, Any]) -> Student:
     try:
         student_to_create = StudentCreate(**payload)
@@ -67,7 +67,7 @@ def post_student(payload: dict[str, Any]) -> Student:
         ) from exc
 
 
-@router.put("/students/{student_id}", response_model=Student)
+@router.put("/students/{student_id}")
 def put_student(student_id: str, payload: dict[str, Any]) -> Student:
     try:
         parsed_student_id = int(student_id)
@@ -102,7 +102,7 @@ def get_students_stats_route() -> dict[str, object]:
     return get_students_stats()
 
 
-@router.get("/students/{student_id}", response_model=Student)
+@router.get("/students/{student_id}")
 def get_student(student_id: str) -> Student:
     try:
         parsed_student_id = int(student_id)
