@@ -11,27 +11,56 @@ permissions:
   packages: read
 
 jobs:
-  deploy-staging:
-    name: Deploy staging (fake)
+  deploy-testing:
+    name: Deploy testing
     runs-on: ubuntu-latest
+
     if: github.event.workflow_run.conclusion == 'success'
-    # environment: staging
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.workflow_run.head_sha }}
-
-      - name: Set image name
+      - name: Compute image
         id: image
-        run: echo "IMAGE=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]'):${{ github.event.workflow_run.head_sha }}" >> $GITHUB_OUTPUT
+        run: |
+          IMAGE_BASE=$(echo "ghcr.io/${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE=$IMAGE_BASE:${{ github.event.workflow_run.head_sha }}" >> $GITHUB_OUTPUT
 
-      - name: Log in to GHCR
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Pull image built in CI
+      - name: Pull image
         run: docker pull ${{ steps.image.outputs.IMAGE }}
 
-      - name: Fake deploy to staging
-        run: echo "Image ${{ steps.image.outputs.IMAGE }} deployed to staging"
+      - name: Deploy to testing
+        run: echo "Deploy ${{ steps.image.outputs.IMAGE }} to testing"
+
+  deploy-production:
+    name: Deploy production
+    runs-on: ubuntu-latest
+
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'master'
+
+    steps:
+      - name: Compute image
+        id: image
+        run: |
+          IMAGE_BASE=$(echo "ghcr.io/${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE=$IMAGE_BASE:${{ github.event.workflow_run.head_sha }}" >> $GITHUB_OUTPUT
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull image
+        run: docker pull ${{ steps.image.outputs.IMAGE }}
+
+      - name: Deploy to production
+        run: echo "Deploy ${{ steps.image.outputs.IMAGE }} to production"
