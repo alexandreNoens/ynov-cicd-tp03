@@ -63,10 +63,8 @@ Le seuil demande de moins de `200MB` est donc respecte, mais avec peu de marge.
 
 ## Trivy en CI
 
-Ce point n'est pas encore implemente.
+Le scan Trivy est désormais intégré à la CI.
 
-Il reste present dans le backlog du projet comme exigence a traiter ensuite:
+Le pipeline CI construit l'image Docker finale, puis exécute un scan Trivy sur cette image. Le pipeline échoue automatiquement en cas de vulnérabilités de sévérité `HIGH` ou `CRITICAL`, conformément à la politique de sécurité du projet.
 
-- construire l'image dans la CI,
-- lancer un scan Trivy sur l'image finale,
-- faire echouer le pipeline sur les vulnerabilites `HIGH` et `CRITICAL` selon la politique retenue.
+Ce contrôle permet de garantir que seules des images conformes aux exigences de sécurité sont produites et déployées.
