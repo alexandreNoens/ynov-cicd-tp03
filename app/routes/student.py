@@ -1,5 +1,5 @@
 import json
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import ValidationError
@@ -24,8 +24,8 @@ router = APIRouter(tags=["students"])
 
 @router.get("/students")
 def get_students(
-    page: int = Query(default=1, ge=1),
-    limit: int = Query(default=10, ge=1),
+    page: Annotated[int, Query(ge=1)] = 1,
+    limit: Annotated[int, Query(ge=1)] = 10,
     sort: Literal[
         "id",
         "first_name",
@@ -40,7 +40,9 @@ def get_students(
 
 
 @router.get("/students/search")
-def get_students_search(q: str | None = Query(default=None)) -> list[Student]:
+def get_students_search(
+    q: Annotated[str | None, Query()] = None,
+) -> list[Student]:
     if q is None or not q.strip():
         raise HTTPException(
             status_code=400, detail="query parameter q is required"
