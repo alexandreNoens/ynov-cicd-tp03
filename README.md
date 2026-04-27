@@ -1,5 +1,11 @@
 # Projet CI/CD & DevOps Production-Ready
 
+[![CI](https://github.com/alexandreNoens/ynov-cicd-tp03/actions/workflows/ci.yml/badge.svg)](https://github.com/alexandreNoens/ynov-cicd-tp03/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)](#prérequis)
+[![FastAPI](https://img.shields.io/badge/FastAPI-modern-009688?logo=fastapi)](https://fastapi.tiangolo.com)
+[![Ruff](https://img.shields.io/badge/lint-ruff-46a2f1?logo=ruff)](https://docs.astral.sh/ruff)
+[![Pytest](https://img.shields.io/badge/tests-pytest-0A9EDC?logo=pytest)](https://docs.pytest.org/)
+
 Concevez, developpez et deployez une application complete avec un pipeline CI/CD professionnel, une architecture de code solide, et une infrastructure reproductible. Votre code, votre pipeline, vos choix, vos justifications.
 
 ## Lancement rapide
