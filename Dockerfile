@@ -26,12 +26,9 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 RUN addgroup -S app && adduser -S -G app -h /home/app app
 
-COPY --from=build /opt/venv /opt/venv
-COPY app ./app
-COPY sql ./sql
-
-RUN chown -R root:root /opt/venv /app/app /app/sql \
-	&& chmod -R a-w /opt/venv /app/app /app/sql
+COPY --from=build --chown=root:root /opt/venv /opt/venv
+COPY --chown=root:root app ./app
+COPY --chown=root:root sql ./sql
 
 USER app
 
