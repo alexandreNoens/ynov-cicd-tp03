@@ -21,6 +21,10 @@ from app.repositories.student import (
 
 router = APIRouter(tags=["students"])
 
+INVALID_STUDENT_ID_MSG = "student id must be a valid number"
+STUDENT_NOT_FOUND_MSG = "student not found"
+STUDENT_EMAIL_EXISTS_MSG = "student email already exists"
+
 
 @router.get("/students")
 def get_students(
@@ -75,7 +79,7 @@ def post_student(payload: dict[str, Any]) -> Student:
     except StudentEmailAlreadyExistsError as exc:
         raise HTTPException(
             status_code=409,
-            detail="student email already exists",
+            detail=STUDENT_EMAIL_EXISTS_MSG,
         ) from exc
 
 
@@ -93,7 +97,7 @@ def put_student(student_id: str, payload: dict[str, Any]) -> Student:
     except ValueError as exc:
         raise HTTPException(
             status_code=400,
-            detail="student id must be a valid number",
+            detail=INVALID_STUDENT_ID_MSG,
         ) from exc
 
     try:
@@ -107,12 +111,12 @@ def put_student(student_id: str, payload: dict[str, Any]) -> Student:
         return update_student(parsed_student_id, student_to_update)
     except StudentNotFoundError as exc:
         raise HTTPException(
-            status_code=404, detail="student not found"
+            status_code=404, detail=STUDENT_NOT_FOUND_MSG
         ) from exc
     except StudentEmailAlreadyExistsError as exc:
         raise HTTPException(
             status_code=409,
-            detail="student email already exists",
+            detail=STUDENT_EMAIL_EXISTS_MSG,
         ) from exc
 
 
@@ -134,12 +138,12 @@ def get_student(student_id: str) -> Student:
     except ValueError as exc:
         raise HTTPException(
             status_code=400,
-            detail="student id must be a valid number",
+            detail=INVALID_STUDENT_ID_MSG,
         ) from exc
 
     student = get_student_by_id(parsed_student_id)
     if student is None:
-        raise HTTPException(status_code=404, detail="student not found")
+        raise HTTPException(status_code=404, detail=STUDENT_NOT_FOUND_MSG)
 
     return student
 
@@ -157,14 +161,14 @@ def delete_student_by_id(student_id: str) -> dict[str, str]:
     except ValueError as exc:
         raise HTTPException(
             status_code=400,
-            detail="student id must be a valid number",
+            detail=INVALID_STUDENT_ID_MSG,
         ) from exc
 
     try:
         delete_student(parsed_student_id)
     except StudentNotFoundError as exc:
         raise HTTPException(
-            status_code=404, detail="student not found"
+            status_code=404, detail=STUDENT_NOT_FOUND_MSG
         ) from exc
 
     return {"message": "student deleted"}
