@@ -71,6 +71,7 @@ Document a consulter:
 - [3 - Qualite de code automatisee.md](documentation/3%20-%20Qualite%20de%20code%20automatisee.md)
 - [4 - Git & Conventions.md](documentation/4%20-%20Git%20&%20Conventions.md)
 - [5 - Docker & Conteneurisation.md](documentation/5%20-%20Docker%20%26%20Conteneurisation.md)
+- [6 - CD & Deployment.md](documentation/6%20-%20CD%20%26%20Deployment.md)
 - [TODO.md](documentation/TODO.md)
 
 Arborescence :
@@ -82,5 +83,6 @@ documentation/
 ├── 3 - Qualite de code automatisee.md
 ├── 4 - Git & Conventions.md
 ├── 5 - Docker & Conteneurisation.md
+├── 6 - CD & Deployment.md
 └── TODO.md
 ```
