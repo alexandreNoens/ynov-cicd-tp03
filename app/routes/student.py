@@ -39,7 +39,10 @@ def get_students(
     return list_students(page=page, limit=limit, sort=sort, order=order)
 
 
-@router.get("/students/search")
+@router.get(
+    "/students/search",
+    responses={400: {"description": "Bad Request"}},
+)
 def get_students_search(
     q: Annotated[str | None, Query()] = None,
 ) -> list[Student]:
@@ -51,7 +54,14 @@ def get_students_search(
     return search_students(q)
 
 
-@router.post("/students", status_code=201)
+@router.post(
+    "/students",
+    status_code=201,
+    responses={
+        400: {"description": "Bad Request"},
+        409: {"description": "Conflict"},
+    },
+)
 def post_student(payload: dict[str, Any]) -> Student:
     try:
         student_to_create = StudentCreate(**payload)
@@ -69,7 +79,14 @@ def post_student(payload: dict[str, Any]) -> Student:
         ) from exc
 
 
-@router.put("/students/{student_id}")
+@router.put(
+    "/students/{student_id}",
+    responses={
+        400: {"description": "Bad Request"},
+        404: {"description": "Not Found"},
+        409: {"description": "Conflict"},
+    },
+)
 def put_student(student_id: str, payload: dict[str, Any]) -> Student:
     try:
         parsed_student_id = int(student_id)
@@ -104,7 +121,13 @@ def get_students_stats_route() -> dict[str, object]:
     return get_students_stats()
 
 
-@router.get("/students/{student_id}")
+@router.get(
+    "/students/{student_id}",
+    responses={
+        400: {"description": "Bad Request"},
+        404: {"description": "Not Found"},
+    },
+)
 def get_student(student_id: str) -> Student:
     try:
         parsed_student_id = int(student_id)
@@ -121,7 +144,13 @@ def get_student(student_id: str) -> Student:
     return student
 
 
-@router.delete("/students/{student_id}")
+@router.delete(
+    "/students/{student_id}",
+    responses={
+        400: {"description": "Bad Request"},
+        404: {"description": "Not Found"},
+    },
+)
 def delete_student_by_id(student_id: str) -> dict[str, str]:
     try:
         parsed_student_id = int(student_id)
