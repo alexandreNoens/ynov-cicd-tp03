@@ -161,4 +161,14 @@ jobs:
           push: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false }}
           tags: ${{ steps.meta.outputs.TAGS }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          load: true
+
+      - name: Scan image Docker using Trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ steps.repo.outputs.IMAGE_BASE }}:${{ github.sha }}
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: HIGH,CRITICAL
