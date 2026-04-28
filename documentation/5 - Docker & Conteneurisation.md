@@ -47,19 +47,22 @@ Un `HEALTHCHECK` applicatif est present pour verifier que l'API repond sur `/hea
 
 ## Taille de l'image
 
-Mesure effectuee localement le 2026-04-09:
+Mesure effectuée localement le 2026-04-28 (après optimisation du Dockerfile) :
 
 ```bash
-docker build -t tp03-app:local .
-docker image inspect tp03-app:local --format '{{.Size}}'
+docker build -t tp03-app:latest .
+docker image inspect tp03-app:latest --format '{{.Size}}'
+# Analyse d'efficacité avec dive
+dive tp03-app:latest
 ```
 
-Resultat:
+Résultat :
 
-- `199500302` octets
-- environ `199.5 MB`
+- `121000000` octets (environ `121 MB`)
+- Espace potentiellement gaspillé : `594 kB`
+- Score d'efficacité : `99 %`
 
-Le seuil demande de moins de `200MB` est donc respecte, mais avec peu de marge.
+Le seuil demandé de moins de `200MB` est donc largement respecté, avec une image optimisée et très peu de gaspillage.
 
 ## Trivy en CI
 
