@@ -11,7 +11,7 @@ Le Dockerfile suit une approche multi-stage:
 
 Ce choix reduit la surface de l'image finale et evite d'embarquer des fichiers de build inutiles.
 
-La base retenue est `python:3.12-slim`. C'est un compromis simple et robuste:
+La base retenue est `python:3.12-alpine`. C'est un compromis simple et robuste:
 
 - plus legere qu'une image Debian complete,
 - plus facile a maintenir qu'une image distroless pour un projet pedagogique,
